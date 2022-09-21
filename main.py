@@ -1,24 +1,22 @@
-import module1 
-import time
-import threading
-import psutil    
+import monitoringone 
+import repository 
+
+new_repository=repository.Repository()
 
 
-process=module1.MonitoringOne()
+#proceso1=module1.ProcessData1()
+#proceso1.config('mousepad',10,new_repository)
+#proceso1.start()
 
-new_repository=module1.Repository()
+#proceso2=module1.ProcessData1()
+#proceso2.config('xfce4-terminal',5,new_repository)
+#proceso2.start()
 
+
+
+process=monitoringone.MonitoringOne()
 process.set_repository(new_repository)
+process.add_monitored('mousepad',5)
+process.add_monitored('xfce4-terminal',10)
 
-
-
-# BUcle principal
-
-process.add_monitored('gnome-screenshot')
-#process.add_monitored('bash')
-
-while (True) :
-	for proc in psutil.process_iter():
-		process.monitoring(proc)
-		#new_repository.log_start_process(proc)
-	time.sleep (1)
+process.start()
