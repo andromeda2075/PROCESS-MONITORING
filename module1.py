@@ -1,5 +1,4 @@
 
-import procesos_info
 import saveData
 '''
 Nombre de un proceso: name_process
@@ -13,24 +12,47 @@ Número de Subprocesos: num_subprocess
 
 '''
 
-class MonitoringOne:
+class MonitoredProccess:
+	name = ''
+	pid = -1
 
+
+class MonitoringOne:
+	m_processList = {}
 	m_repository=0
 
 
 	def __init__(self):
 		print('Objeto monitoring_one creado')
 	
-	def monitoring(self,name1,name2):
-		print('monitorenado')
+	def monitoring(self,proc):
+		#print(name)
+		if proc.name() in self.m_processList:
+			print(proc.name(), ':  pid=', proc.pid)
+			if self.m_processList[proc.name()] == -1:
+				self.m_processList[proc.name()] = proc.pid
+				#registrar inicio
+				print ('primera registro')
+			else:
+				if self.m_processList[proc.name()] != proc.pid:
+					print('cambio')
+					self.m_processList[proc.name()] = proc.pid
+					#regirar en el repositorio el cambio
+			
+		#else:
+		#	print('no considerado')
 		# Obtener los procesos de varayoc y por cada uno guaRdar el detalle
-		self.m_repository.log_process_detail(name1,name2)
+		#
+		#self.m_repository.log_process_detail(name,name2)
 		
 	def set_repository(self,repository):
 		self.m_repository=repository
 		pass
 		
-		
+	def add_monitored(self,name):
+		if not name in self.m_processList:
+			self.m_processList [name] = -1
+			print(name, 'se agrega a la lista de monitoreo')
 		
 class Repository:
     
