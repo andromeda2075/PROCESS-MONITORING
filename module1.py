@@ -1,5 +1,7 @@
 
 import saveData
+from datetime import datetime
+import string
 '''
 Nombre de un proceso: name_process
 Identificador de un proceso: pid
@@ -26,24 +28,29 @@ class MonitoringOne:
 		print('Objeto monitoring_one creado')
 	
 	def monitoring(self,proc):
-		#print(name)
+		time_restar=[]
+		name_process=[]
 		if proc.name() in self.m_processList:
 			print(proc.name(), ':  pid=', proc.pid)
 			if self.m_processList[proc.name()] == -1:
 				self.m_processList[proc.name()] = proc.pid
-				#registrar inicio
-				print ('primera registro')
+				t=datetime.fromtimestamp(proc.create_time()).strftime('%H:%M:%S')
+				print ('primer registro','Tiempo de inicio ', t)
+
 			else:
 				if self.m_processList[proc.name()] != proc.pid:
-					print('cambio')
+					tr=datetime.fromtimestamp(proc.create_time()).strftime('%H:%M:%S')
+					time_restar.append(tr)
+					name_process.append(proc.name())
+					print('cambio','tiempo de reinicio',tr)
+					#print('cambio')
 					self.m_processList[proc.name()] = proc.pid
 					#regirar en el repositorio el cambio
-			
-		#else:
-		#	print('no considerado')
-		# Obtener los procesos de varayoc y por cada uno guaRdar el detalle
-		#
-		#self.m_repository.log_process_detail(name,name2)
+					with open("process.txt","a") as file:
+						info_process=proc.name()+' '+str(proc.pid)+' '+str(tr)+'\n'
+						file.write(info_process)
+				
+
 		
 	def set_repository(self,repository):
 		self.m_repository=repository
@@ -59,15 +66,14 @@ class Repository:
 	def __init__(self):
 		print('se ha creado el repositorio')
     	
-	def log_start_process(self,name_process,pid):
+	def log_start_process(self,proc):
+		#tiempo_inicial=datetime.fromtimestamp(proc.create_time()).strftime('%H:%M:%S')
+		#print(tiempo_inicial)
 		pass
-    	
+
 	def log_process_detail(self,name1,name2):
 	
-		saveData.save_data(name1,name2)
-		
-		
-    		
+		pass	
     	
 	def log_restart_process(self):
 		pass
