@@ -36,6 +36,7 @@ class ProcessData1(threading.Thread):
 	
 	def run(self):
 		self.m_isRunning=True
+		event = threading.Event()
 		while (self.m_isRunning):
 			exist = False
 			for proc in psutil.process_iter():#(['pid', 'name', 'username']):
@@ -50,7 +51,7 @@ class ProcessData1(threading.Thread):
 
 						#registrar inicio
 						#self.m_repository.log_sart_proccess(proc)
-						print ('primera registro')
+						print ('PRIMER REGISTRO')
 					else:
 						if self.m_pid == proc.pid:
 							if time.time()>= self.m_timeControl:
@@ -70,7 +71,7 @@ class ProcessData1(threading.Thread):
 				self.m_exist = False
 				#registrar caida
 				print ("se cayo")
-			time.sleep(1)
+			event.wait(1)
 
 	def set_repository(self,repository):
 		self.m_repository=repository
@@ -92,20 +93,21 @@ class MonitoringOne(threading.Thread):
 	def monitoring(self,proc):
 		if proc.name() in self.m_monitoredList:
 			monitored = self.m_monitoredList[proc.name()] 
-
+			
 			if monitored.m_pid == -1:
 				monitored.m_pid = proc.pid
 				monitored.m_timeControl = proc.create_time() + monitored.m_period
 				#registrar inicio
 				self.m_repository.log_start_process(proc)
-				#print (proc.name(),'primer registro')
+				self.AddChildren(proc,monitored.m_period)
+
 			else:
 				if monitored.m_pid == proc.pid:
+					self.AddChildren(proc,monitored.m_period)
 					if time.time()>= monitored.m_timeControl:
-						monitored.m_timeControl = time.time() + + monitored.m_period
+						monitored.m_timeControl = time.time() +  monitored.m_period
 						#registrar uso
 						self.m_repository.log_running_process(proc)
-						#print(proc.name(),"registrar uso")
 				'''
 				else:
 					monitored.m_pid = proc.pid
@@ -120,19 +122,23 @@ class MonitoringOne(threading.Thread):
 			
 	def run(self):
 		self.m_isRunning=True
+		event = threading.Event()
 		while (self.m_isRunning):
 			for proc in psutil.process_iter():#(['pid', 'name', 'username']):
 				self.monitoring(proc)
+				#if proc.name()=='sleep':
+
+					#print(proc.parents())
 
 			for index in self.m_monitoredList:
 				monitored = self.m_monitoredList[index]
 				if monitored.m_pid != -1 and monitored.m_processed == False:
 					#registrar caida
-					self.m_repository.log_fail_process(index,monitored)					
+					self.m_repository.log_fail_process(index,monitored.m_pid)					
 					monitored.m_pid = -1
-					#print(index,'cayo ')
 				monitored.m_processed = False
-			time.sleep(1)
+			event.wait(1)
+
 		
 	def set_repository(self,repository):
 		self.m_repository=repository
@@ -144,4 +150,10 @@ class MonitoringOne(threading.Thread):
 			monitored.m_period = period
 			self.m_monitoredList [name] = monitored
 			print(name, 'se agrega a la lista de monitoreo')
+
+	def AddChildren(self,proc,period):
+		print(proc.name(), ' procesos hijo: ', proc.children())
+		for subproc in proc.children():
+			self.add_monitored(subproc.name(),period)
+			#print('Se aprega un subproceso: ', subproc.name())
 		

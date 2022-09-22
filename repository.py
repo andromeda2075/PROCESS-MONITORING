@@ -14,15 +14,12 @@ class Repository:
         #tiempo_inicial=datetime.fromtimestamp(proc.create_time()).strftime('%H:%M:%S')
         print(proc.name(),"se registra consumo del proceso")
 
-    def log_fail_process(self,name,monitored):
-        print(name, "se registra caida del proceso. Ultimo PID=",monitored.m_pid)
+    def log_fail_process(self,name,pid):
+        print(name, "se registra caida del proceso. Ultimo PID=",pid)
 
     def PC_process(self):
         pass
      
-
-
-
 class SqliteRepository(Repository):
     dbName=""
     con = 0
@@ -60,7 +57,7 @@ class SqliteRepository(Repository):
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
-        print(proc.name(),"se registra inicio del proceso")
+        print(proc.name(),"se registra inicio del proceso",proc.pid)
 
     def log_running_process(self,proc):
         self.lock.acquire()
@@ -70,18 +67,20 @@ class SqliteRepository(Repository):
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
-        print(proc.name(),"se registra consumo del proceso")
+        #for row in cur.execute("SELECT name,pid")
+        #print(proc.name(),"se registra consumo del proceso")
+        print(proc.name()," Se registra ")
 
-    def log_fail_process(self,name,monitored):
+    def log_fail_process(self,name,pid):
         self.lock.acquire()
         data = [
-            (name, time.time(),"fail",monitored.m_pid,0,0),
+            (name, time.time(),"fail",pid,0,0),
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
-        print(name, "se registra caida del proceso. Ultimo PID=",monitored.m_pid)
+        print(name, " Registra caida del proceso. Ultimo PID=",pid)
 
-   
+  
 
 
