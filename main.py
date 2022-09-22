@@ -1,8 +1,7 @@
 import monitoringone 
 import repository 
 
-new_repository=repository.Repository()
-
+new_repository=repository.SqliteRepository("base.sql")
 
 #proceso1=module1.ProcessData1()
 #proceso1.config('mousepad',10,new_repository)
