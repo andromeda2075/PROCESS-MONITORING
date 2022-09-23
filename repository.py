@@ -37,7 +37,7 @@ class SqliteRepository(Repository):
         res = self.cur.execute("SELECT name FROM sqlite_master WHERE name='monitored'")
         if res.fetchone() is None:
             print("monitored: tabla no existe")
-            self.cur.execute("CREATE TABLE monitored(name,timestamp,event, pid, cpu,memory)")
+            self.cur.execute("CREATE TABLE monitored(name,timestamp,event, pid, cpu, memory)")
         else:
             print("monitored: tabla existe")
 
@@ -50,19 +50,23 @@ class SqliteRepository(Repository):
             print("pc: tabla existe")
     
     def log_start_process(self,proc):
+        """Método que inicia el proceso"""
         self.lock.acquire()
         data = [
-            (proc.name(), proc.create_time(),"start", proc.pid,9, 9),
+            (proc.name(), proc.create_time(),"start", proc.pid,proc.cpu_percent(interval=0.5),proc.memory_percent()),
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
         print(proc.name(),"se registra inicio del proceso",proc.pid)
 
+    
+
     def log_running_process(self,proc):
+        """Método que iregitra el proceso"""
         self.lock.acquire()
         data = [
-            (proc.name(), time.time(),"runnig",proc.pid,9, 9),
+            (proc.name(), time.time(),"runnig",proc.pid, proc.cpu_percent(interval=0.1),proc.memory_percent()),
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
@@ -72,6 +76,7 @@ class SqliteRepository(Repository):
         print(proc.name()," Se registra ")
 
     def log_fail_process(self,name,pid):
+        """Método que reporta la caida"""
         self.lock.acquire()
         data = [
             (name, time.time(),"fail",pid,0,0),

@@ -17,7 +17,6 @@ Número de Subprocesos: num_subprocess
 
 '''
 
-
 class ProcessData1(threading.Thread):
 	m_pid = -1
 	m_timeControl = 0
