@@ -19,5 +19,7 @@ process.set_repository(new_repository)
 #process.add_monitored('xfce4-terminal',10)
 
 #process.add_monitored('mousepad',5)
-process.add_monitored('gnome-shell',10)
+name='bash'
+period=10
+process.add_monitored(name,period)
 process.start()
