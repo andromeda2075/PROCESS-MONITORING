@@ -125,9 +125,6 @@ class MonitoringOne(threading.Thread):
 		while (self.m_isRunning):
 			for proc in psutil.process_iter():#(['pid', 'name', 'username']):
 				self.monitoring(proc)
-				#if proc.name()=='sleep':
-
-					#print(proc.parents())
 
 			for index in self.m_monitoredList:
 				monitored = self.m_monitoredList[index]
@@ -142,7 +139,7 @@ class MonitoringOne(threading.Thread):
 	def set_repository(self,repository):
 		self.m_repository=repository
 		
-	def add_monitored(self,name,period):
+	def add_monitored(self,name,period,monitoring_children=False):
 		if not name in self.m_monitoredList:
 			monitored = ProcessData()
 			monitored.m_pid = -1
@@ -151,7 +148,7 @@ class MonitoringOne(threading.Thread):
 			print(name, 'se agrega a la lista de monitoreo')
 
 	def AddChildren(self,proc,period):
-		print(proc.name(), ' procesos hijo: ', proc.children())
+		#print(proc.name(), ' procesos hijo: ', proc.children())
 		for subproc in proc.children():
 			self.add_monitored(subproc.name(),period)
 			#print('Se aprega un subproceso: ', subproc.name())

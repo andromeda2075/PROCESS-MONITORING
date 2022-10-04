@@ -1,0 +1,18 @@
+{
+  "db_file": "base.db",
+  "ring_base": false,
+  "max_register":13,
+  "process_list":[
+  		{
+          "name":"bash",
+          "period":25,
+          "monitoring_children":false
+        },
+        {
+          "name":"ssh",
+          "period":50,
+          "monitoring_children":true
+        }
+    ]
+}
+
