@@ -5,12 +5,12 @@
   "process_list":[
   		{
           "name":"bash",
-          "period":25,
+          "period":5,
           "monitoring_children":false
         },
         {
           "name":"ssh",
-          "period":50,
+          "period":10,
           "monitoring_children":true
         }
     ]
