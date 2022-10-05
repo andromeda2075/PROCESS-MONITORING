@@ -1,27 +1,21 @@
-import monitoringone 
+import process_monitor 
 import repository 
-import json
+import configuration
 
-file='config.json'
+## LECTURA DE LA CONFIGUARACION DESDE UN ARCHIVO JSON
+config = configuration.Configuration()
 
-f = open(file, "r")
-data = json.load(f)
-db_file=data['db_file']
+##SE CREA UN REPOSITORIO QUE GUARDA DATA EN UNA BD SQLITE
+new_repository=repository.SqliteRepository(config.getDbFile(),config.isRingBase(),config.getMaxRegisters())
 
-new_repository=repository.SqliteRepository(db_file,data['ring_base'],data['max_register'])
-
-## ejemplo de uso de la implementacion con hilo por proceso
-#proceso1=module1.ProcessData1()
-#proceso1.config('mousepad',10,new_repository)
-#proceso1.start()
-#proceso2=module1.ProcessData1()
-#proceso2.config('xfce4-terminal',5,new_repository)
-#proceso2.start()
-
-process_monitor=monitoringone.MonitoringOne()
+##SE CREA EL MONITOR DE PROCESOS
+process_monitor=process_monitor.ProcessMonitor()
 process_monitor.set_repository(new_repository)
 
-for process in data['process_list']:
+
+##SE AGREGAN LOS PROCESOS A MONITOREAR
+for process in config.getProcesses():
     process_monitor.add_monitored(process['name'],process['period'],process['monitoring_children'])
 
+##SE INICIA EL MONITOREO
 process_monitor.start()
