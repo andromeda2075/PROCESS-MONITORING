@@ -3,9 +3,9 @@ Description=Hello Service
 
 [Service]
 ;User=root
-ExecStart=python3 /home/soporte/PROCESOS/main.py
+ExecStart=python3 /usr/local/monitor/main.py
 ;Type=simple
-WorkingDirectory=/home/soporte/PROCESOS/
+WorkingDirectory=/usr/local/monitor
 Restart=always
 
 [Install]
