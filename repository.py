@@ -2,7 +2,6 @@ import sqlite3
 import time
 import threading
 import os
-from numpy import append
 
 class Repository:
     def __init__(self):
