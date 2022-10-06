@@ -1,7 +1,7 @@
 import sqlite3
 import time
 import threading
-
+import os
 from numpy import append
 
 class Repository:
@@ -29,11 +29,14 @@ class SqliteRepository(Repository):
     lock = 0
     is_ring = False
     max_register = -1
+    url_prefix = "/var/local/monitor/" # Ruta de donde se extraerà la base de datos
     
     def __init__(self,name,ring=False,max_register=-1):
         super().__init__()
         self.dbName = name
-        self.con = sqlite3.connect(self.dbName, check_same_thread=False)
+        if not os.path.exists(self.url_prefix):
+            os.mkdir(self.url_prefix)
+        self.con = sqlite3.connect(self.url_prefix + self.dbName, check_same_thread=False)
         self.cur = self.con.cursor()
         self.lock = threading.Semaphore()
         self.is_ring=ring
@@ -69,10 +72,7 @@ class SqliteRepository(Repository):
                 self.cur.execute(sentence)
             else:
                 print("Trigger delete_tail  existe")
-             
-        
-
-
+            
 
     def log_start_process(self,proc):
         """Método que inicia el proceso"""
