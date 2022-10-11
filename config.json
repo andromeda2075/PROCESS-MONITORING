@@ -7,7 +7,14 @@
           "name":"ssh",
           "period":5,
           "monitoring_children":true
+        },
+        {
+          "name":"gedit",
+          "period":1,
+          "monitoring_children":true
+        
         }
+        
     ]
 }
 

@@ -6,7 +6,7 @@ class Configuration:
     data=0
 
     def __init__(self):
-        ## LECTURA DE LA CONFIGUARACION DESDE UN ARCHIVO JSON
+        ## LECTURA DE LA CONFIGURACION DESDE UN ARCHIVO JSON
 
         self.file = open(self.file_name, "r")
         self.data = json.load(self.file)

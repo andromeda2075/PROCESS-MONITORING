@@ -18,7 +18,6 @@ class ProcessData1(threading.Thread):
 		self.m_period = period
 		self.m_name = name
 
-	
 	def run(self):
 		self.m_isRunning=True
 		event = threading.Event()

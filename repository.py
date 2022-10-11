@@ -3,6 +3,7 @@ import time
 import threading
 import os
 
+
 class Repository:
     def __init__(self):
         print('se ha creado el repositorio')
@@ -18,8 +19,8 @@ class Repository:
     def log_fail_process(self,name,pid):
         print(name, "se registra caida del proceso. Ultimo PID=",pid)
 
-    def PC_process(self):
-        pass
+    def log_start_pc_info(self):
+        print('Informacion de la PC')
      
 class SqliteRepository(Repository):
     dbName=""
@@ -52,12 +53,14 @@ class SqliteRepository(Repository):
             print("monitored: tabla existe")
 
 
-        res = self.cur.execute("SELECT name FROM sqlite_master WHERE name='pc'")
+        res = self.cur.execute("SELECT name FROM sqlite_master WHERE name='info_system'")  # TABLA PARA LA PC
         if res.fetchone() is None:
-            print("pc: tabla no existe")
-            self.cur.execute("CREATE TABLE pc(name,timestamp,event, pid, cpu,memory)")
+            print("INFO_SYSTEM: tabla no existe")
+            self.cur.execute("CREATE TABLE info_system(max_freq,min_freq,total_cpu,total_cores,total_memory,available_memory,used_memory,memory_percent,bytes_sent,bytes_recived)")
         else:
-            print("pc: tabla existe")
+            print("PC_SYSTEM: tabla existe")
+
+
         #TODO crear el trigger cuando ring es igual a TRUE
         if self.is_ring and self.max_register>0 :
             self.cur.execute("select * from sqlite_master where type = 'trigger' and name='delete_tail'")
@@ -77,25 +80,26 @@ class SqliteRepository(Repository):
         """Método que inicia el proceso"""
         self.lock.acquire()
         data = [
-            (proc.name(), proc.create_time(),"start", proc.pid,proc.cpu_percent(interval=0.5),proc.memory_percent()),
+            (proc.name(), proc.create_time(),"start", proc.pid,proc.cpu_percent(interval=None),round(proc.memory_percent(),3)),
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
-        print(proc.name(),"se registra inicio del proceso",proc.pid)
+        print(proc.name(),"se registra inicio del proceso",proc.pid,proc.cpu_percent(),round(proc.memory_percent(),3))
+
 
     def log_running_process(self,proc):
         """Método que iregitra el proceso"""
         self.lock.acquire()
         data = [
-            (proc.name(), time.time(),"runnig",proc.pid, proc.cpu_percent(interval=0.1),proc.memory_percent()),
+            (proc.name(), time.time(),"runnig",proc.pid, proc.cpu_percent(interval=None),round(proc.memory_percent(),3)),
         ]
         self.cur.executemany("INSERT INTO monitored VALUES(?, ?, ?, ?, ?, ?)", data)
         self.con.commit()
         self.lock.release()
         #for row in cur.execute("SELECT name,pid")
         #print(proc.name(),"se registra consumo del proceso")
-        print(proc.name()," Se registra ")
+        print(proc.name()," Se registra el proceso",proc.pid,proc.cpu_percent(),round(proc.memory_percent(),3))
 
     def log_fail_process(self,name,pid):
         """Método que reporta la caida"""
@@ -108,6 +112,16 @@ class SqliteRepository(Repository):
         self.lock.release()
         print(name, " Registra caida del proceso. Ultimo PID=",pid)
 
+    def log_start_pc_info(self,data_list):
+                                        
+        self.lock.acquire()
+        data_system_info=[(data_list[0],data_list[1],data_list[2],data_list[3],data_list[4],data_list[5],data_list[6],data_list[7],data_list[8],data_list[9])]
+        self.cur.executemany("INSERT INTO info_system VALUES(?, ?, ?, ?, ?, ?,?,?,?,?)", data_system_info)
+        self.con.commit()
+        self.lock.release()
+
+    
+        
   
 
 
